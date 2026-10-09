@@ -6,6 +6,8 @@ import (
 	"go-study/routers"
 	"html/template"
 
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
@@ -38,7 +40,9 @@ func main() {
 	r.Use(initMiddlewareOne, initMiddlewareTwo)
 	//配置静态web目录   第一个参数表示路由, 第二个参数表示映射的目录
 	r.Static("/static", "./static")
-
+	// secret111是用来加密的密钥, 需要16位以上
+	store := cookie.NewStore([]byte("secret111"))
+	r.Use(sessions.Sessions("mysession", store))
 	routers.AdminRoutersInit(r)
 
 	routers.ApiRoutersInit(r)
