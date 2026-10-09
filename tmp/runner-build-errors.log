@@ -1,0 +1,2 @@
+# go-study
+.\main.go:47:62: cannot use []byte("secret1111111111123") (value of type []byte) as string value in argument to redis.NewStore

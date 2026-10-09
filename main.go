@@ -5,9 +5,10 @@ import (
 	"go-study/models"
 	"go-study/routers"
 	"html/template"
+	"net/http"
 
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 )
 
@@ -40,9 +41,29 @@ func main() {
 	r.Use(initMiddlewareOne, initMiddlewareTwo)
 	//配置静态web目录   第一个参数表示路由, 第二个参数表示映射的目录
 	r.Static("/static", "./static")
-	// secret111是用来加密的密钥, 需要16位以上
-	store := cookie.NewStore([]byte("secret111"))
+
+	// 密钥, 需要16位以上
+	// store := cookie.NewStore([]byte("secret1111111111123"))
+	// 注意新版签名多了 username 参数:
+	// NewStore(size, network, address, username, password string, keyPairs ...[]byte)
+	// 没有用户名/密码也要占位, 传 ""
+	store, err := redis.NewStore(10, "tcp", "localhost:6379", "", "", []byte("secret1111111111123"))
+	if err != nil {
+		panic(err)
+	}
+
+	// 注意: gorilla/sessions 新版(>=1.3)默认 Secure=true、SameSite=None,
+	// 这会导致 http 环境下浏览器拒绝保存该 cookie, session 看起来"不生效"。
+	// 本地开发必须显式关掉 Secure, 否则 http://localhost:8080 下 session 读不到值。
+	store.Options(sessions.Options{
+		Path:     "/",
+		MaxAge:   3600 * 24, // 一天
+		HttpOnly: true,
+		Secure:   false,                // 本地 http 调试必须为 false
+		SameSite: http.SameSiteLaxMode, // 默认 None 需配合 Secure, 这里改用 Lax
+	})
 	r.Use(sessions.Sessions("mysession", store))
+
 	routers.AdminRoutersInit(r)
 
 	routers.ApiRoutersInit(r)
