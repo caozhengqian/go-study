@@ -1,32 +1,49 @@
 package main
 
 import (
-	"net/http"
+	"fmt"
+	"go-study/models"
+	"go-study/routers"
+	"html/template"
 
 	"github.com/gin-gonic/gin"
 )
 
+func initMiddlewareOne(c *gin.Context) {
+
+	fmt.Println("开始-第一个中间件initMiddlewareOne")
+	//调用该请求的剩余处理程序
+	c.Next()
+
+	fmt.Println("结束-第一个中间件initMiddlewareOne")
+
+}
+func initMiddlewareTwo(c *gin.Context) {
+
+	fmt.Println("开始-第二个中间件initMiddlewareTwo")
+	//调用该请求的剩余处理程序
+	c.Next()
+
+	fmt.Println("结束-第二个中间件initMiddlewareTwo")
+
+}
 func main() {
 	// 创建一个默认的路由引擎
 	r := gin.Default()
-	//配置路由
-	r.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "值:%v", "你好gin")
+	//自定义模板函数  注意要把这个函数放在加载模板前,
+	r.SetFuncMap(template.FuncMap{
+		"Totime": models.UnixToTime,
 	})
-	r.GET("/new", func(c *gin.Context) {
-		c.String(http.StatusOK, "值:%v", "进入new路由")
-	})
-	r.POST("/add", func(c *gin.Context) {
-		c.String(http.StatusOK, "post请求的add路了由")
-	})
+	//全局中间件
+	r.Use(initMiddlewareOne, initMiddlewareTwo)
+	//配置静态web目录   第一个参数表示路由, 第二个参数表示映射的目录
+	r.Static("/static", "./static")
 
-	r.PUT("/edit", func(c *gin.Context) {
-		c.String(200, "这是一个put请求 主要用于编辑数据")
-	})
+	routers.AdminRoutersInit(r)
 
-	r.DELETE("/delete", func(c *gin.Context) {
-		c.String(200, "这是一个DELETE请求 用于删除数据")
-	})
-	r.Run(":8080") // 默认在 localhost:8080 启动服务
+	routers.ApiRoutersInit(r)
 
+	routers.DefaultRoutersInit(r)
+
+	r.Run()
 }
