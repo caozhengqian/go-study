@@ -1,2 +1,0 @@
-# go-study/routers
-routers\defaultRouters.go:12:54: itying.DefaultController{}.Index undefined (type itying.DefaultController has no field or method Index)

@@ -8,6 +8,9 @@ import (
 
 type DefaultController struct{}
 
+func (con DefaultController) Index(c *gin.Context) {
+	c.String(200, "Index")
+}
 func (con DefaultController) News(c *gin.Context) {
 	username, _ := c.Cookie("username")
 	fmt.Println("cookie中username的值为：", username)
