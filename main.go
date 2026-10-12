@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/redis"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
@@ -43,14 +43,14 @@ func main() {
 	r.Static("/static", "./static")
 
 	// 密钥, 需要16位以上
-	// store := cookie.NewStore([]byte("secret1111111111123"))
+	store := cookie.NewStore([]byte("secret1111111111123"))
 	// 注意新版签名多了 username 参数:
 	// NewStore(size, network, address, username, password string, keyPairs ...[]byte)
 	// 没有用户名/密码也要占位, 传 ""
-	store, err := redis.NewStore(10, "tcp", "localhost:6379", "", "", []byte("secret1111111111123"))
-	if err != nil {
-		panic(err)
-	}
+	// store, err := redis.NewStore(10, "tcp", "localhost:6379", "", "", []byte("secret1111111111123"))
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	// 注意: gorilla/sessions 新版(>=1.3)默认 Secure=true、SameSite=None,
 	// 这会导致 http 环境下浏览器拒绝保存该 cookie, session 看起来"不生效"。
