@@ -21,5 +21,7 @@ func AdminRoutersInit(r *gin.Engine) {
 		adminRouters.GET("/article/edit", admin.ArticleController{}.Edit)
 
 		adminRouters.GET("/student", admin.StudentController{}.Index)
+		adminRouters.GET("/bank", admin.BankController{}.Index)
+
 	}
 }
