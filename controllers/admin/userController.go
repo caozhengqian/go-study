@@ -2,6 +2,7 @@ package admin
 
 import (
 	"fmt"
+	"go-study/models"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -12,10 +13,11 @@ type UserController struct {
 }
 
 func (con UserController) Index(c *gin.Context) {
-	session := sessions.Default(c)
-	session.Set("usernames", "lisi")
-	session.Save()
-	con.success(c)
+	usersList := []models.Users{}
+	models.DB.Where("age>20").Find(&usersList)
+	c.JSON(200, gin.H{
+		"result": usersList,
+	})
 }
 func (con UserController) Add(c *gin.Context) {
 	session := sessions.Default(c)
