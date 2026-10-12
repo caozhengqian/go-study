@@ -1,10 +1,8 @@
 package admin
 
 import (
-	"fmt"
 	"go-study/models"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,11 +18,29 @@ func (con UserController) Index(c *gin.Context) {
 	})
 }
 func (con UserController) Add(c *gin.Context) {
-	session := sessions.Default(c)
-	usernames := session.Get("usernames")
-	fmt.Println("session中usernames的值为：", usernames)
-	c.String(200, "用户列表-add---")
+	user := models.Users{
+		Username: "itying GORM",
+		Age:      22,
+		Email:    "222@qq.con",
+		AddTime:  int(models.GetUnix()),
+	}
+
+	models.DB.Create(&user)
+	c.String(200, "增加数据成功")
 }
 func (con UserController) Edit(c *gin.Context) {
+	user := models.Users{}
+	models.DB.Where("id = ?", 13).Find(&user)
+	user.Username = "哈哈"
+	user.Email = "aaa@qqq.com"
+	user.AddTime = int(models.GetUnix())
+	models.DB.Save(&user)
+	c.String(200, "用户列表-Edit------")
+}
+func (con UserController) Del(c *gin.Context) {
+	//删除数据
+	user := models.Users{}
+	models.DB.Where("username = ?", "zhangsan").Delete(&user)
+
 	c.String(200, "用户列表-Edit------")
 }
